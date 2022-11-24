@@ -6,6 +6,10 @@ public class ClientePf extends Cliente {
 	private String nome;
 	private Integer idade;
 
+	public ClientePf() {
+		
+	}
+	
 	public ClientePf(Integer numero, Integer agencia, String telefone, Double saldo, Double limite, String cpf,
 			String nome, Integer idade) {
 		super(numero, agencia, telefone, saldo, limite);
@@ -30,11 +34,11 @@ public class ClientePf extends Cliente {
 		this.nome = nome;
 	}
 
-	public int getIdade() {
+	public Integer getIdade() {
 		return idade;
 	}
 
-	public void setIdade(int idade) {
+	public void setIdade(Integer idade) {
 		this.idade = idade;
 	}
 

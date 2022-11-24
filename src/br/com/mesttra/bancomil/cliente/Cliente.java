@@ -10,6 +10,10 @@ public abstract class Cliente {
 	private Double saldo;
 	private Double limite;
 
+	public Cliente() {
+		
+	}
+	
 	public Cliente(Integer numero, Integer agencia, String telefone, Double saldo, Double limite) {
 		this.numero = numero;
 		this.agencia = agencia;
@@ -61,6 +65,10 @@ public abstract class Cliente {
 
 	public Double getSaldo() {
 		return saldo;
+	}
+
+	public void setSaldo(Double saldo) {
+		this.saldo = saldo;
 	}
 
 	public Double getLimite() {

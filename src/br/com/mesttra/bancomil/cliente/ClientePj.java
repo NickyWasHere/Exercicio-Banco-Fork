@@ -6,6 +6,10 @@ public class ClientePj extends Cliente {
 	private String nomeSocial;
 	private String nomeFantasia;
 
+	public ClientePj() {
+		
+	}
+	
 	public ClientePj(Integer numero, Integer agencia, String telefone, Double saldo, Double limite, String cnpj,
 			 String nomeSocial, String nomeFantasia) {
 		super(numero, agencia, telefone, saldo, limite);
@@ -13,7 +17,7 @@ public class ClientePj extends Cliente {
 		this.nomeFantasia = nomeFantasia;
 		this.nomeSocial = nomeSocial;
 	}
-
+	
 	public String getCnpj() {
 		return cnpj;
 	}
@@ -21,8 +25,6 @@ public class ClientePj extends Cliente {
 	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
 	}
-
-
 
 	public String getNomeSocial() {
 		return nomeSocial;
@@ -40,7 +42,6 @@ public class ClientePj extends Cliente {
 		this.nomeFantasia = nomeFantasia;
 	}
 
-	
 	@Override
 	public String toString() {
 		String cliente = ("Numero: " + getNumero() + "\n" + "Agencia: " + getAgencia() + "\n" + "Telefone: "

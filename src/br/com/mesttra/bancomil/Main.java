@@ -6,6 +6,7 @@ import java.util.Scanner;
 import br.com.mesttra.bancomil.cliente.Cliente;
 import br.com.mesttra.bancomil.cliente.ClientePf;
 import br.com.mesttra.bancomil.cliente.ClientePj;
+import br.com.mesttra.bancomil.dao.ClienteDAO;
 import br.com.mesttra.bancomil.service.FuncoesGerente;
 import br.com.mesttra.bancomil.util.Menu;
 import br.com.mesttra.bancomil.util.SaldoInsuficienteException;
@@ -16,10 +17,12 @@ public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
 		Scanner input = new Scanner(System.in);
-
+		
+		ClienteDAO clienteDAO = new ClienteDAO();
+		
 		FuncoesGerente gerente = new FuncoesGerente();
 		Menu ui = new Menu();
-//		PopulaBanco();
+		PopulaBanco();
 
 		int cadastrados = 0;
 		limpaConsole();
