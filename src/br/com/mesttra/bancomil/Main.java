@@ -1,6 +1,7 @@
 package br.com.mesttra.bancomil;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import br.com.mesttra.bancomil.cliente.Cliente;
@@ -193,12 +194,18 @@ public class Main {
 			System.out.println("3-Excluir");
 			System.out.println("4-Sair");
 			System.out.println("5-Depositar");
+			System.out.println("6-Transferencia");
+			System.out.println("7-Clientes devedores");
+			System.out.println("8-Ver todos");
+			System.out.println("9-Mudar limite");
 			System.out.print("Resposta: ");
 			int resp=input.nextInt();
 			System.out.println();
 			
 			ClientePf cliente1 = new ClientePf();
 			ClientePj cliente2 = new ClientePj();
+			ClientePf cliente3 = new ClientePf();
+			ClientePj cliente4 = new ClientePj();
 			
 			switch(resp) {
 			
@@ -208,8 +215,15 @@ public class Main {
 				clienteDAO.cadastrarClientePF(cliente1);
 		
 				//Cadastro PJ
-			    cliente2 = new ClientePj(1002, 1, "12981164404", 800.00, 5000.00, "5954563454356", "Combater o cancer", "Cloreto");
+			    cliente2 = new ClientePj(1008, 1, "12981164404", 800.00, 5000.00, "5954563454356", "Combater o cancer", "Cloreto");
 				clienteDAO.cadastrarClientePJ(cliente2);
+				
+				//Cadastro devedor
+				cliente3 = new ClientePf(1003, 1, "12996291100", -200.00, 1000.00, "51554530", "Nicolas", 19);
+				clienteDAO.cadastrarClientePF(cliente3);
+				
+				cliente4 = new ClientePj(1004, 1, "12981164404", -800.00, 5000.00, "sfsd44356", "Combater o cancer", "Cloreto");
+				clienteDAO.cadastrarClientePJ(cliente4);
 				break;
 				
 			case 2:
@@ -218,6 +232,7 @@ public class Main {
 				
 				//Ver clientePJ
 				System.out.println(clienteDAO.consultarCliente(cliente2, 1002));
+				break;
 				
 			case 3:
 				//Excluir PF
@@ -233,6 +248,38 @@ public class Main {
 			case 5:
 				clienteDAO.depositar(cliente1, 400.00, 1001);
 				clienteDAO.depositar(cliente2, 2000.00, 1002);
+				break;
+				
+			case 6:
+				clienteDAO.realizarTransferencia(cliente1, cliente2, 200.00, 1001, 1002);
+				clienteDAO.realizarTransferencia(cliente2, cliente1, 800.00, 1002, 1001);
+				break;
+				
+			case 7:
+				ArrayList<ClientePf> clientesPf = clienteDAO.clientesDevedoresPF();
+				ArrayList<ClientePj> clientesPj = clienteDAO.clientesDevedoresPJ();
+				
+				System.out.println("Pessoa física: ");
+				for (ClientePf cliente : clientesPf) {
+					System.out.println(cliente);
+				}
+				
+				System.out.println("Pessoa jurídica: ");
+				for (ClientePj cliente : clientesPj) {
+					System.out.println(cliente);
+				}
+				break;
+				
+			case 8:
+				ArrayList<Cliente> clientes = clienteDAO.relatorio();
+				for (Cliente cliente : clientes) {
+					System.out.println(cliente);
+				}
+				break;
+				
+			case 9:
+				clienteDAO.alterarLimite(cliente1, 2000, 1001);
+				clienteDAO.alterarLimite(cliente4, 200.00, 1004);
 			}
 	
 		}		

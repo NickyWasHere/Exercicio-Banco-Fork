@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import br.com.mesttra.bancomil.cliente.Cliente;
 import br.com.mesttra.bancomil.cliente.ClientePf;
@@ -70,12 +71,25 @@ public class ClienteDAO {
 				PreparedStatement stmt = conn.prepareStatement(sql);
 				stmt.setInt(1, numero);
 				
-				ClientePf clientePf = retornarClientePF(stmt);
-				return clientePf;
+				ResultSet rs = stmt.executeQuery();
+				while (rs.next()) {
+					ClientePf clientePf = new ClientePf();
+					
+					clientePf.setNumero(rs.getInt("numero"));
+					clientePf.setAgencia(rs.getInt("agencia"));
+					clientePf.setTelefone(rs.getString("telefone"));
+					clientePf.setSaldo(rs.getDouble("saldo"));
+					clientePf.setLimite(rs.getDouble("limite"));
+					clientePf.setCpf(rs.getString("cpf"));
+					clientePf.setNome(rs.getString("nome"));
+					clientePf.setIdade(rs.getInt("idade"));
+					
+					return clientePf;
+				}
 				
 			} catch (SQLException e) {
 				e.printStackTrace();
-			}
+			}	
 			
 		} else {
 			String sql = "SELECT * FROM clientePJ WHERE numero = ?";
@@ -84,97 +98,187 @@ public class ClienteDAO {
 				PreparedStatement stmt = conn.prepareStatement(sql);
 				stmt.setInt(1, numero);
 				
-				ClientePj clientePj = retornarClientePJ(stmt);
-				return clientePj;
+				ResultSet rs = stmt.executeQuery();
+				while (rs.next()) {
+					ClientePj clientePj = new ClientePj();
+					
+					clientePj.setNumero(rs.getInt("numero"));
+					clientePj.setNumero(rs.getInt("numero"));
+					clientePj.setAgencia(rs.getInt("agencia"));
+					clientePj.setTelefone(rs.getString("telefone"));
+					clientePj.setSaldo(rs.getDouble("saldo"));
+					clientePj.setLimite(rs.getDouble("limite"));
+					clientePj.setCnpj(rs.getString("cnpj"));
+					clientePj.setRazaoSocial(rs.getString("razaoSocial"));
+					clientePj.setNomeFantasia(rs.getString("nomeFantasia"));
+					
+					return clientePj;
+				}
 				
 			} catch (SQLException e) {
 				e.printStackTrace();
-			}
-		}	
-		
+			}		
+		}
+	
 		return null;
 	}
 	
 	public void removerCliente(Cliente cliente, int numero) {
+		String sql;
+		
 		if (cliente instanceof ClientePf) {
-			String sql = "DELETE FROM clientePF WHERE numero = ?";
-			
-			try {
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				stmt.setInt(1, numero);
-				stmt.execute();
-				stmt.close();
-				
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			
+			sql = "DELETE FROM clientePF WHERE numero = ?";		
 		} else {
-			String sql = "DELETE FROM clientePJ WHERE numero = ?";
+			sql = "DELETE FROM clientePJ WHERE numero = ?";	
+		}
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, numero);
+			stmt.execute();
+			stmt.close();
 			
-			try {
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				stmt.setInt(1, numero);
-				stmt.execute();
-				stmt.close();
-				
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 	
-	public void realizarTransferencia() {
+	public void realizarTransferencia(Cliente cliente1, Cliente cliente2, double valor, int origem, int destino) {
+		String sqlOrigem;
+		String sqlDestino;
 		
+		if (cliente1 instanceof ClientePf) {
+			sqlOrigem = "UPDATE clientePF SET saldo = saldo - ? WHERE numero = ?";
+		} else {
+			sqlOrigem = "UPDATE clientePJ SET saldo = saldo - ? WHERE numero = ?";
+		}
+		
+		if (cliente2 instanceof ClientePf) {
+			sqlDestino = "UPDATE clientePF SET saldo = saldo + ? WHERE numero = ?";
+		} else {
+			sqlDestino = "UPDATE clientePJ SET saldo = saldo + ? WHERE numero = ?";
+		}
+		
+		try {
+			PreparedStatement stmt1 = conn.prepareStatement(sqlOrigem);
+			PreparedStatement stmt2 = conn.prepareStatement(sqlDestino);
+			
+			stmt1.setDouble(1, valor);
+			stmt1.setInt(2, origem);
+			stmt1.execute();
+			stmt1.close();
+			
+			stmt2.setDouble(1, valor);
+			stmt2.setInt(2, destino);
+			stmt2.execute();
+			stmt2.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public void alterarLimite() {
+	public void alterarLimite(Cliente cliente, double valor, int numero) {
+		String sql;
 		
+		if (cliente instanceof ClientePf) {
+			sql = "UPDATE clientePF SET limite = ? WHERE numero = ?";
+		} else {
+			sql = "UPDATE clientePJ SET limite = ? WHERE numero = ?";
+		}
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			stmt.setDouble(1, valor);
+			stmt.setInt(2, numero);
+			stmt.execute();
+			stmt.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void depositar(Cliente cliente, double saldo, int numero) {
+		String sql;
+		
 		if (cliente instanceof ClientePf) {
-			String sql = "UPDATE clientePF SET saldo = saldo + ? WHERE numero = ?";
-			
-			try {
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				
-				stmt.setDouble(1, saldo);
-				stmt.setInt(2, numero);
-				stmt.execute();
-				stmt.close();
-				
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			
+			sql = "UPDATE clientePF SET saldo = saldo + ? WHERE numero = ?";
 		} else {
-			String sql = "UPDATE clientePJ SET saldo = saldo + ? WHERE numero = ?";
+			sql = "UPDATE clientePJ SET saldo = saldo + ? WHERE numero = ?";
+		}
 			
-			try {
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				
-				stmt.setDouble(1, saldo);
-				stmt.setInt(2, numero);
-				stmt.execute();
-				stmt.close();
-				
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+		try {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			
+			stmt.setDouble(1, saldo);
+			stmt.setInt(2, numero);
+			stmt.execute();
+			stmt.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 	
-	public void clientesDevedores() {
+	public ArrayList<ClientePf> clientesDevedoresPF() {
+		String sql = "SELECT * FROM clientePF WHERE saldo < 0";
 		
-	}
-	
-	public void relatorio() {
-		
-	}
-	
-	public ClientePf retornarClientePF(PreparedStatement stmt) {
 		try {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			
+			return retornarClientePf(stmt);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	public ArrayList<ClientePj> clientesDevedoresPJ() {
+		String sql = "SELECT * FROM clientePJ WHERE saldo < 0";
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			
+			return retornarClientePj(stmt);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	public ArrayList<Cliente> relatorio() {
+		String sql1 = "SELECT * FROM clientePF";
+		String sql2 = "SELECT * FROM clientePJ";
+		
+		try {
+			PreparedStatement stmt1 = conn.prepareStatement(sql1);
+			PreparedStatement stmt2 = conn.prepareStatement(sql2);
+		
+			ArrayList<ClientePf> clientesPf = retornarClientePf(stmt1);
+			ArrayList<ClientePj> clientesPj = retornarClientePj(stmt2);
+			
+			ArrayList<Cliente> clientes = new ArrayList<>();
+			clientes.addAll(clientesPf);
+			clientes.addAll(clientesPj);
+			
+			return clientes;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	public ArrayList<ClientePf> retornarClientePf(PreparedStatement stmt) {
+		ArrayList<ClientePf> clientes = new ArrayList<>();
+		
+		try {			
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
 				ClientePf cliente = new ClientePf();
@@ -188,22 +292,27 @@ public class ClienteDAO {
 				cliente.setNome(rs.getString("nome"));
 				cliente.setIdade(rs.getInt("idade"));
 				
-				return cliente;
+				clientes.add(cliente);
 			}
+			
+			rs.close();
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return clientes;
 	}
 	
-	public ClientePj retornarClientePJ(PreparedStatement stmt) {
-		try {
+	public ArrayList<ClientePj> retornarClientePj(PreparedStatement stmt) {
+		ArrayList<ClientePj> clientes = new ArrayList<>();
+		
+		try {			
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
 				ClientePj cliente = new ClientePj();
 				
+				cliente.setNumero(rs.getInt("numero"));
 				cliente.setNumero(rs.getInt("numero"));
 				cliente.setAgencia(rs.getInt("agencia"));
 				cliente.setTelefone(rs.getString("telefone"));
@@ -213,13 +322,15 @@ public class ClienteDAO {
 				cliente.setRazaoSocial(rs.getString("razaoSocial"));
 				cliente.setNomeFantasia(rs.getString("nomeFantasia"));
 				
-				return cliente;
+				clientes.add(cliente);
 			}
+			
+			rs.close();
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return clientes;
 	}
 }
