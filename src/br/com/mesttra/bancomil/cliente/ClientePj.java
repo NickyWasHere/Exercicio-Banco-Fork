@@ -3,7 +3,7 @@ package br.com.mesttra.bancomil.cliente;
 public class ClientePj extends Cliente {
 
 	private String cnpj;
-	private String nomeSocial;
+	private String razaoSocial;
 	private String nomeFantasia;
 
 	public ClientePj() {
@@ -11,11 +11,11 @@ public class ClientePj extends Cliente {
 	}
 	
 	public ClientePj(Integer numero, Integer agencia, String telefone, Double saldo, Double limite, String cnpj,
-			 String nomeSocial, String nomeFantasia) {
+			 String razaoSocial, String nomeFantasia) {
 		super(numero, agencia, telefone, saldo, limite);
 		this.cnpj = cnpj;
 		this.nomeFantasia = nomeFantasia;
-		this.nomeSocial = nomeSocial;
+		this.razaoSocial = razaoSocial;
 	}
 	
 	public String getCnpj() {
@@ -26,12 +26,12 @@ public class ClientePj extends Cliente {
 		this.cnpj = cnpj;
 	}
 
-	public String getNomeSocial() {
-		return nomeSocial;
+	public String getRazaoSocial() {
+		return razaoSocial;
 	}
 
-	public void setNomeSocial(String nomeSocial) {
-		this.nomeSocial = nomeSocial;
+	public void setRazaoSocial(String razaoSocial) {
+		this.razaoSocial = razaoSocial;
 	}
 
 	public String getNomeFantasia() {
@@ -46,7 +46,7 @@ public class ClientePj extends Cliente {
 	public String toString() {
 		String cliente = ("Numero: " + getNumero() + "\n" + "Agencia: " + getAgencia() + "\n" + "Telefone: "
 				+ getTelefone() + "\n" + "Saldo: " + getSaldo() + "\n" + "Limite: " + getLimite() + "\n" + "Cnpj: "
-				+ getCnpj() + "\n" + "Razão social: " + getNomeSocial() + "\n"
+				+ getCnpj() + "\n" + "Razão social: " + getRazaoSocial() + "\n"
 				+ "Nome fantasia: " + getNomeFantasia() + "\n");
 
 		return cliente;

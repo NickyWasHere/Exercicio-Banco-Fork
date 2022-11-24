@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import br.com.mesttra.bancomil.cliente.Cliente;
 import br.com.mesttra.bancomil.cliente.ClientePf;
+import br.com.mesttra.bancomil.cliente.ClientePj;
 import br.com.mesttra.bancomil.connectionFactory.ConnectionFactory;
 
 public class ClienteDAO {
@@ -19,50 +20,49 @@ public class ClienteDAO {
 		System.out.println();
 	}
 	
-	public void cadastrarCliente(Cliente cliente) {
-		if (cliente instanceof ClientePf) {
-			String sql = "INSERT INTO clientePF values (?, ?, ?, ?, ?, ?, ?, ?)";
+	public void cadastrarClientePF(ClientePf cliente) {
+		String sql = "INSERT INTO clientePF values (?, ?, ?, ?, ?, ?, ?, ?)";
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, cliente.getNumero());
+			stmt.setInt(2, cliente.getAgencia());
+			stmt.setString(3, cliente.getTelefone());
+			stmt.setDouble(4, cliente.getSaldo());
+			stmt.setDouble(5, cliente.getLimite());
+			stmt.setString(6, cliente.getCpf());
+			stmt.setString(7, cliente.getNome());
+			stmt.setInt(8, cliente.getIdade());
+			stmt.execute();
+			stmt.close();
 			
-			try {
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				stmt.setInt(1, 0);
-				stmt.setInt(2, 0);
-				stmt.setString(3, "");
-				stmt.setDouble(4, 0);
-				stmt.setDouble(5, 0);
-				stmt.setString(6, "");
-				stmt.setString(7, "");
-				stmt.setInt(8, 0);
-				stmt.execute();
-				stmt.close();
-				
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			
-		} else {
-			String sql = "INSERT INTO clientePJ values (?, ?, ?, ?, ?, ?, ?, ?)";
-			
-			try {
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				stmt.setInt(1, 0);
-				stmt.setInt(2, 0);
-				stmt.setString(3, "");
-				stmt.setDouble(4, 0);
-				stmt.setDouble(5, 0);
-				stmt.setString(6, "");
-				stmt.setString(7, "");
-				stmt.setString(8, "");
-				stmt.execute();
-				stmt.close();
-				
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}		
 	}
 	
-	public void consultarCliente(Cliente cliente, int numero) {
+	public void cadastrarClientePJ(ClientePj cliente) {
+		String sql = "INSERT INTO clientePJ values (?, ?, ?, ?, ?, ?, ?, ?)";
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, cliente.getNumero());
+			stmt.setInt(2, cliente.getAgencia());
+			stmt.setString(3, cliente.getTelefone());
+			stmt.setDouble(4, cliente.getSaldo());
+			stmt.setDouble(5, cliente.getLimite());
+			stmt.setString(6, cliente.getCnpj());
+			stmt.setString(7, cliente.getRazaoSocial());
+			stmt.setString(8, cliente.getNomeFantasia());
+			stmt.execute();
+			stmt.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public Cliente consultarCliente(Cliente cliente, int numero) {
 		if (cliente instanceof ClientePf) {
 			String sql = "SELECT * FROM clientePF WHERE numero = ?";
 			
@@ -70,13 +70,29 @@ public class ClienteDAO {
 				PreparedStatement stmt = conn.prepareStatement(sql);
 				stmt.setInt(1, numero);
 				
+				ClientePf clientePf = retornarClientePF(stmt);
+				return clientePf;
+				
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 			
 		} else {
+			String sql = "SELECT * FROM clientePJ WHERE numero = ?";
 			
-		}		
+			try {
+				PreparedStatement stmt = conn.prepareStatement(sql);
+				stmt.setInt(1, numero);
+				
+				ClientePj clientePj = retornarClientePJ(stmt);
+				return clientePj;
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}	
+		
+		return null;
 	}
 	
 	public void removerCliente(Cliente cliente, int numero) {
@@ -116,8 +132,37 @@ public class ClienteDAO {
 		
 	}
 	
-	public void depositar() {
-		
+	public void depositar(Cliente cliente, double saldo, int numero) {
+		if (cliente instanceof ClientePf) {
+			String sql = "UPDATE clientePF SET saldo = saldo + ? WHERE numero = ?";
+			
+			try {
+				PreparedStatement stmt = conn.prepareStatement(sql);
+				
+				stmt.setDouble(1, saldo);
+				stmt.setInt(2, numero);
+				stmt.execute();
+				stmt.close();
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+		} else {
+			String sql = "UPDATE clientePJ SET saldo = saldo + ? WHERE numero = ?";
+			
+			try {
+				PreparedStatement stmt = conn.prepareStatement(sql);
+				
+				stmt.setDouble(1, saldo);
+				stmt.setInt(2, numero);
+				stmt.execute();
+				stmt.close();
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public void clientesDevedores() {
@@ -128,38 +173,53 @@ public class ClienteDAO {
 		
 	}
 	
-	public void retornarClientePF(PreparedStatement stmt) {
+	public ClientePf retornarClientePF(PreparedStatement stmt) {
 		try {
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
 				ClientePf cliente = new ClientePf();
-				
-//				private Integer numero;
-//				private Integer agencia;
-//				private String telefone;
-//				private Double saldo;
-//				private Double limite;
-//				private String cpf;
-//				private String nome;
-//				private Integer idade;
-				
-//				private String cnpj;
-//				private String nomeSocial;
-//				private String nomeFantasia;
 				
 				cliente.setNumero(rs.getInt("numero"));
 				cliente.setAgencia(rs.getInt("agencia"));
 				cliente.setTelefone(rs.getString("telefone"));
 				cliente.setSaldo(rs.getDouble("saldo"));
 				cliente.setLimite(rs.getDouble("limite"));
+				cliente.setCpf(rs.getString("cpf"));
+				cliente.setNome(rs.getString("nome"));
+				cliente.setIdade(rs.getInt("idade"));
+				
+				return cliente;
 			}
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+		return null;
 	}
 	
-	public void retornarClientePJ(PreparedStatement stmt) {
+	public ClientePj retornarClientePJ(PreparedStatement stmt) {
+		try {
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				ClientePj cliente = new ClientePj();
+				
+				cliente.setNumero(rs.getInt("numero"));
+				cliente.setAgencia(rs.getInt("agencia"));
+				cliente.setTelefone(rs.getString("telefone"));
+				cliente.setSaldo(rs.getDouble("saldo"));
+				cliente.setLimite(rs.getDouble("limite"));
+				cliente.setCnpj(rs.getString("cnpj"));
+				cliente.setRazaoSocial(rs.getString("razaoSocial"));
+				cliente.setNomeFantasia(rs.getString("nomeFantasia"));
+				
+				return cliente;
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
+		return null;
 	}
 }

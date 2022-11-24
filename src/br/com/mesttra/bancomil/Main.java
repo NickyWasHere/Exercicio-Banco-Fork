@@ -19,6 +19,7 @@ public class Main {
 		Scanner input = new Scanner(System.in);
 		
 		ClienteDAO clienteDAO = new ClienteDAO();
+		testes(clienteDAO, input);
 		
 		FuncoesGerente gerente = new FuncoesGerente();
 		Menu ui = new Menu();
@@ -183,6 +184,58 @@ public class Main {
 		clientes[6] = cliente6;
 		clientes[7] = cliente7;
 
+	}
+	
+	public static void testes(ClienteDAO clienteDAO, Scanner input) {
+		while (true) {
+			System.out.println("1-Cadastro");
+			System.out.println("2-Ver cliente");
+			System.out.println("3-Excluir");
+			System.out.println("4-Sair");
+			System.out.println("5-Depositar");
+			System.out.print("Resposta: ");
+			int resp=input.nextInt();
+			System.out.println();
+			
+			ClientePf cliente1 = new ClientePf();
+			ClientePj cliente2 = new ClientePj();
+			
+			switch(resp) {
+			
+			case 1:
+				//Cadastro PF
+				cliente1 = new ClientePf(1001, 1, "12996291100", 200.00, 1000.00, "47663159870", "Nicolas", 19);
+				clienteDAO.cadastrarClientePF(cliente1);
+		
+				//Cadastro PJ
+			    cliente2 = new ClientePj(1002, 1, "12981164404", 800.00, 5000.00, "5954563454356", "Combater o cancer", "Cloreto");
+				clienteDAO.cadastrarClientePJ(cliente2);
+				break;
+				
+			case 2:
+				//Ver clientePF
+				System.out.println(clienteDAO.consultarCliente(cliente1, 1001));
+				
+				//Ver clientePJ
+				System.out.println(clienteDAO.consultarCliente(cliente2, 1002));
+				
+			case 3:
+				//Excluir PF
+				clienteDAO.removerCliente(cliente1, 1001);
+				
+				//Excluir PJ
+				clienteDAO.removerCliente(cliente2, 1002);
+				break;
+				
+			case 4:
+				return;
+				
+			case 5:
+				clienteDAO.depositar(cliente1, 400.00, 1001);
+				clienteDAO.depositar(cliente2, 2000.00, 1002);
+			}
+	
+		}		
 	}
 
 }
