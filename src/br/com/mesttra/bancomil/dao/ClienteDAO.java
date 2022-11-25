@@ -63,74 +63,69 @@ public class ClienteDAO {
 		}
 	}
 	
-	public Cliente consultarCliente(Cliente cliente, int numero) {
-		if (cliente instanceof ClientePf) {
-			String sql = "SELECT * FROM clientePF WHERE numero = ?";
+	public Cliente consultarClientePf(int numero) {
+		String sql = "SELECT * FROM clientePF WHERE numero = ?";
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, numero);
 			
-			try {
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				stmt.setInt(1, numero);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				ClientePf clientePf = new ClientePf();
 				
-				ResultSet rs = stmt.executeQuery();
-				while (rs.next()) {
-					ClientePf clientePf = new ClientePf();
-					
-					clientePf.setNumero(rs.getInt("numero"));
-					clientePf.setAgencia(rs.getInt("agencia"));
-					clientePf.setTelefone(rs.getString("telefone"));
-					clientePf.setSaldo(rs.getDouble("saldo"));
-					clientePf.setLimite(rs.getDouble("limite"));
-					clientePf.setCpf(rs.getString("cpf"));
-					clientePf.setNome(rs.getString("nome"));
-					clientePf.setIdade(rs.getInt("idade"));
-					
-					return clientePf;
-				}
+				clientePf.setNumero(rs.getInt("numero"));
+				clientePf.setAgencia(rs.getInt("agencia"));
+				clientePf.setTelefone(rs.getString("telefone"));
+				clientePf.setSaldo(rs.getDouble("saldo"));
+				clientePf.setLimite(rs.getDouble("limite"));
+				clientePf.setCpf(rs.getString("cpf"));
+				clientePf.setNome(rs.getString("nome"));
+				clientePf.setIdade(rs.getInt("idade"));
 				
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}	
+				return clientePf;
+			}
 			
-		} else {
-			String sql = "SELECT * FROM clientePJ WHERE numero = ?";
-			
-			try {
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				stmt.setInt(1, numero);
-				
-				ResultSet rs = stmt.executeQuery();
-				while (rs.next()) {
-					ClientePj clientePj = new ClientePj();
-					
-					clientePj.setNumero(rs.getInt("numero"));
-					clientePj.setNumero(rs.getInt("numero"));
-					clientePj.setAgencia(rs.getInt("agencia"));
-					clientePj.setTelefone(rs.getString("telefone"));
-					clientePj.setSaldo(rs.getDouble("saldo"));
-					clientePj.setLimite(rs.getDouble("limite"));
-					clientePj.setCnpj(rs.getString("cnpj"));
-					clientePj.setRazaoSocial(rs.getString("razaoSocial"));
-					clientePj.setNomeFantasia(rs.getString("nomeFantasia"));
-					
-					return clientePj;
-				}
-				
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}		
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	
 		return null;
 	}
 	
-	public void removerCliente(Cliente cliente, int numero) {
-		String sql;
+	public Cliente ConsultarClientePj(int numero) {
+		String sql = "SELECT * FROM clientePJ WHERE numero = ?";
 		
-		if (cliente instanceof ClientePf) {
-			sql = "DELETE FROM clientePF WHERE numero = ?";		
-		} else {
-			sql = "DELETE FROM clientePJ WHERE numero = ?";	
-		}
+		try {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, numero);
+			
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				ClientePj clientePj = new ClientePj();
+				
+				clientePj.setNumero(rs.getInt("numero"));
+				clientePj.setNumero(rs.getInt("numero"));
+				clientePj.setAgencia(rs.getInt("agencia"));
+				clientePj.setTelefone(rs.getString("telefone"));
+				clientePj.setSaldo(rs.getDouble("saldo"));
+				clientePj.setLimite(rs.getDouble("limite"));
+				clientePj.setCnpj(rs.getString("cnpj"));
+				clientePj.setRazaoSocial(rs.getString("razaoSocial"));
+				clientePj.setNomeFantasia(rs.getString("nomeFantasia"));
+				
+				return clientePj;
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}	
+		
+		return null;
+	}
+	
+	public void removerClientePf(int numero) {
+		String sql = "DELETE FROM clientePF WHERE numero = ?";	
 		
 		try {
 			PreparedStatement stmt = conn.prepareStatement(sql);
@@ -143,21 +138,23 @@ public class ClienteDAO {
 		}
 	}
 	
-	public void realizarTransferencia(Cliente cliente1, Cliente cliente2, double valor, int origem, int destino) {
-		String sqlOrigem;
-		String sqlDestino;
+	public void removerClientePj(int numero) {
+		String sql = "DELETE FROM clientePJ WHERE numero = ?";	
 		
-		if (cliente1 instanceof ClientePf) {
-			sqlOrigem = "UPDATE clientePF SET saldo = saldo - ? WHERE numero = ?";
-		} else {
-			sqlOrigem = "UPDATE clientePJ SET saldo = saldo - ? WHERE numero = ?";
+		try {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, numero);
+			stmt.execute();
+			stmt.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-		
-		if (cliente2 instanceof ClientePf) {
-			sqlDestino = "UPDATE clientePF SET saldo = saldo + ? WHERE numero = ?";
-		} else {
-			sqlDestino = "UPDATE clientePJ SET saldo = saldo + ? WHERE numero = ?";
-		}
+	}
+	
+	public void realizarTransferenciaPfToPf(double valor, int origem, int destino) {
+		String sqlOrigem = "UPDATE clientePF SET saldo = saldo - ? WHERE numero = ?";
+		String sqlDestino = "UPDATE clientePF SET saldo = saldo + ? WHERE numero = ?";
 		
 		try {
 			PreparedStatement stmt1 = conn.prepareStatement(sqlOrigem);
@@ -178,14 +175,77 @@ public class ClienteDAO {
 		}
 	}
 	
-	public void alterarLimite(Cliente cliente, double valor, int numero) {
-		String sql;
+	public void realizarTransferenciaPfToPj(double valor, int origem, int destino) {
+		String sqlOrigem = "UPDATE clientePF SET saldo = saldo - ? WHERE numero = ?";
+		String sqlDestino = "UPDATE clientePJ SET saldo = saldo + ? WHERE numero = ?";
 		
-		if (cliente instanceof ClientePf) {
-			sql = "UPDATE clientePF SET limite = ? WHERE numero = ?";
-		} else {
-			sql = "UPDATE clientePJ SET limite = ? WHERE numero = ?";
+		try {
+			PreparedStatement stmt1 = conn.prepareStatement(sqlOrigem);
+			PreparedStatement stmt2 = conn.prepareStatement(sqlDestino);
+			
+			stmt1.setDouble(1, valor);
+			stmt1.setInt(2, origem);
+			stmt1.execute();
+			stmt1.close();
+			
+			stmt2.setDouble(1, valor);
+			stmt2.setInt(2, destino);
+			stmt2.execute();
+			stmt2.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
+	}
+	
+	public void realizarTransferenciaPjToPf(double valor, int origem, int destino) {
+		String sqlOrigem = "UPDATE clientePJ SET saldo = saldo - ? WHERE numero = ?";
+		String sqlDestino = "UPDATE clientePF SET saldo = saldo + ? WHERE numero = ?";
+		
+		try {
+			PreparedStatement stmt1 = conn.prepareStatement(sqlOrigem);
+			PreparedStatement stmt2 = conn.prepareStatement(sqlDestino);
+			
+			stmt1.setDouble(1, valor);
+			stmt1.setInt(2, origem);
+			stmt1.execute();
+			stmt1.close();
+			
+			stmt2.setDouble(1, valor);
+			stmt2.setInt(2, destino);
+			stmt2.execute();
+			stmt2.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void realizarTransferenciaPjToPj(double valor, int origem, int destino) {
+		String sqlOrigem = "UPDATE clientePJ SET saldo = saldo - ? WHERE numero = ?";
+		String sqlDestino = "UPDATE clientePJ SET saldo = saldo + ? WHERE numero = ?";
+		
+		try {
+			PreparedStatement stmt1 = conn.prepareStatement(sqlOrigem);
+			PreparedStatement stmt2 = conn.prepareStatement(sqlDestino);
+			
+			stmt1.setDouble(1, valor);
+			stmt1.setInt(2, origem);
+			stmt1.execute();
+			stmt1.close();
+			
+			stmt2.setDouble(1, valor);
+			stmt2.setInt(2, destino);
+			stmt2.execute();
+			stmt2.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void alterarLimitePf(double valor, int numero) {
+		String sql = "UPDATE clientePF SET limite = ? WHERE numero = ?";
 		
 		try {
 			PreparedStatement stmt = conn.prepareStatement(sql);
@@ -199,14 +259,39 @@ public class ClienteDAO {
 		}
 	}
 	
-	public void depositar(Cliente cliente, double saldo, int numero) {
-		String sql;
+	public void alterarLimitePj(double valor, int numero) {
+		String sql = "UPDATE clientePJ SET limite = ? WHERE numero = ?";
 		
-		if (cliente instanceof ClientePf) {
-			sql = "UPDATE clientePF SET saldo = saldo + ? WHERE numero = ?";
-		} else {
-			sql = "UPDATE clientePJ SET saldo = saldo + ? WHERE numero = ?";
+		try {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			stmt.setDouble(1, valor);
+			stmt.setInt(2, numero);
+			stmt.execute();
+			stmt.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
+	}
+	
+	public void depositarPf(double saldo, int numero) {
+		String sql = "UPDATE clientePF SET saldo = saldo + ? WHERE numero = ?";
+			
+		try {
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			
+			stmt.setDouble(1, saldo);
+			stmt.setInt(2, numero);
+			stmt.execute();
+			stmt.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void depositarPj(double saldo, int numero) {
+		String sql = "UPDATE clientePJ SET saldo = saldo + ? WHERE numero = ?";
 			
 		try {
 			PreparedStatement stmt = conn.prepareStatement(sql);
